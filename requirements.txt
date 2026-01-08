@@ -1,0 +1,11 @@
+Flask==3.0.0
+psutil==5.9.6
+reportlab==4.0.7
+Werkzeug==3.0.1
+
+# NEW DEPENDENCIES FOR SECURITY ENHANCEMENTS
+Flask-WTF==1.2.1
+WTForms==3.1.1
+Flask-Limiter==3.5.0
+python-dotenv==1.0.0
+email-validator==2.1.0

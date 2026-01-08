@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register | Security Toolkit</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    .error-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .error-list li {
+      margin-bottom: 4px;
+    }
+    .password-strength {
+      margin-top: 8px;
+      font-size: 12px;
+    }
+    .strength-weak { color: #f56565; }
+    .strength-medium { color: #ed8936; }
+    .strength-strong { color: #48bb78; }
+  </style>
+</head>
+<body>
+
+  <div class="login-box">
+    <h2>Create Account</h2>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert {{ 'success' if category == 'success' else 'error' }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% if form.errors %}
+      <div class="error">
+        <ul class="error-list">
+        {% for field, errors in form.errors.items() %}
+          {% for error in errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
+    <form method="POST" action="{{ url_for('register') }}">
+      {{ form.hidden_tag() }}
+      
+      <label for="username">Choose Username</label>
+      {{ form.username(class="form-control", placeholder="Choose a username (3-50 characters)", id="username", autofocus=true) }}
+      <small style="display: block; margin-top: 4px; color: #718096; font-size: 12px;">
+        Only letters, numbers, and underscores allowed
+      </small>
+
+      <label for="password">Choose Password</label>
+      {{ form.password(class="form-control", placeholder="Choose a strong password (min 6 characters)", id="password", onkeyup="checkPasswordStrength()") }}
+      <div id="passwordStrength" class="password-strength"></div>
+
+      <label for="confirm_password">Confirm Password</label>
+      {{ form.confirm_password(class="form-control", placeholder="Re-enter your password", id="confirm_password") }}
+
+      <button type="submit" class="btn-register">Register</button>
+    </form>
+
+    <div class="form-footer">
+      <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+    </div>
+  </div>
+
+  <script>
+    function checkPasswordStrength() {
+      const password = document.getElementById('password').value;
+      const strengthDiv = document.getElementById('passwordStrength');
+      
+      if (password.length === 0) {
+        strengthDiv.textContent = '';
+        return;
+      }
+      
+      let strength = 0;
+      if (password.length >= 6) strength++;
+      if (password.length >= 8) strength++;
+      if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+      if (/\d/.test(password)) strength++;
+      if (/[^a-zA-Z0-9]/.test(password)) strength++;
+      
+      if (strength <= 2) {
+        strengthDiv.textContent = '⚠️ Weak password';
+        strengthDiv.className = 'password-strength strength-weak';
+      } else if (strength <= 4) {
+        strengthDiv.textContent = '✓ Medium password';
+        strengthDiv.className = 'password-strength strength-medium';
+      } else {
+        strengthDiv.textContent = '✓✓ Strong password';
+        strengthDiv.className = 'password-strength strength-strong';
+      }
+    }
+  </script>
+
+</body>
+</html>

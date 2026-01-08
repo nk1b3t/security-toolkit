@@ -1,0 +1,54 @@
+# Environment variables (SENSITIVE!)
+.env
+.env.local
+.env.*.local
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+security_toolkit.db
+
+# Log files
+*.log
+logs/
+security_toolkit.log*
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Backup files
+*.backup
+*.bak
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Baseline files
+baseline.json
+last_port_scan.json
+scans.db
+
+# Keep these templates
+!.env.example
+!.gitignore

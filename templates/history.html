@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>History & Logs - Security Toolkit</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  
+  <style>
+    body {
+      background: #f5f7fa;
+      color: #2d3748;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.dark {
+      background: #1a202c;
+      color: #e2e8f0;
+    }
+
+    .header {
+      height: 64px;
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 0 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    body.dark .header {
+      background: #2d3748;
+      border-bottom-color: #4a5568;
+    }
+
+    .header-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #2d3748;
+    }
+
+    body.dark .header-title {
+      color: #e2e8f0;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 32px auto;
+      padding: 0 32px;
+    }
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    body.dark .tabs {
+      border-bottom-color: #4a5568;
+    }
+
+    .tab-btn {
+      padding: 12px 24px;
+      background: none;
+      border: none;
+      color: #718096;
+      font-weight: 500;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover {
+      color: #2d3748;
+    }
+
+    body.dark .tab-btn:hover {
+      color: #e2e8f0;
+    }
+
+    .tab-btn.active {
+      color: #4299e1;
+      border-bottom-color: #4299e1;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .history-table {
+      background: #ffffff;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    body.dark .history-table {
+      background: #2d3748;
+      border-color: #4a5568;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      background: #f7fafc;
+      padding: 16px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 14px;
+      color: #4a5568;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    body.dark th {
+      background: #1a202c;
+      color: #a0aec0;
+      border-bottom-color: #4a5568;
+    }
+
+    td {
+      padding: 16px;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 14px;
+    }
+
+    body.dark td {
+      border-bottom-color: #4a5568;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover {
+      background: #f7fafc;
+    }
+
+    body.dark tr:hover {
+      background: #374151;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge-success {
+      background: #c6f6d5;
+      color: #22543d;
+    }
+
+    body.dark .badge-success {
+      background: #276749;
+      color: #9ae6b4;
+    }
+
+    .badge-info {
+      background: #bee3f8;
+      color: #2c5282;
+    }
+
+    body.dark .badge-info {
+      background: #2c5282;
+      color: #90cdf4;
+    }
+
+    /* Added warning badge style for RAM usage */
+    .badge-warning {
+      background: #feebc8;
+      color: #744210;
+    }
+    
+    body.dark .badge-warning {
+      background: #744210;
+      color: #feebc8;
+    }
+
+    .no-data {
+      text-align: center;
+      padding: 60px 20px;
+      color: #a0aec0;
+    }
+
+    .back-btn {
+      display: inline-block;
+      padding: 10px 20px;
+      background: #4299e1;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 500;
+      margin-bottom: 24px;
+      transition: all 0.2s;
+    }
+
+    .back-btn:hover {
+      background: #3182ce;
+      transform: translateY(-1px);
+    }
+
+    .export-btn {
+      display: inline-block;
+      padding: 10px 20px;
+      background: #4299e1;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .export-btn:hover {
+      background: #3182ce;
+      transform: translateY(-1px);
+      color: white;
+    }
+
+    .export-btn-secondary {
+      background: #48bb78;
+    }
+
+    .export-btn-secondary:hover {
+      background: #38a169;
+    }
+
+    .search-box {
+      margin-bottom: 20px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .search-input {
+      flex: 1;
+      padding: 10px 16px;
+      border: 1px solid #cbd5e0;
+      border-radius: 6px;
+      font-size: 14px;
+      background: #ffffff;
+      color: #2d3748;
+      transition: all 0.2s;
+    }
+
+    body.dark .search-input {
+      background: #1a202c;
+      border-color: #4a5568;
+      color: #e2e8f0;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: #4299e1;
+      box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+    }
+
+    .filter-select {
+      padding: 10px 16px;
+      border: 1px solid #cbd5e0;
+      border-radius: 6px;
+      font-size: 14px;
+      background: #ffffff;
+      color: #2d3748;
+      cursor: pointer;
+      min-width: 150px;
+    }
+
+    body.dark .filter-select {
+      background: #1a202c;
+      border-color: #4a5568;
+      color: #e2e8f0;
+    }
+
+    .clear-btn {
+      padding: 10px 20px;
+      background: #718096;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .clear-btn:hover {
+      background: #4a5568;
+    }
+
+    /* RESPONSIVE DESIGN */
+    @media (max-width: 768px) {
+      .container {
+        padding: 0 16px;
+        margin: 16px auto;
+      }
+
+      .page-title {
+        font-size: 22px;
+      }
+
+      .tabs {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .tab-btn {
+        font-size: 13px;
+        padding: 10px 16px;
+        white-space: nowrap;
+      }
+
+      .search-box {
+        flex-direction: column;
+      }
+
+      .filter-select {
+        width: 100%;
+      }
+
+      .history-table {
+        overflow-x: auto;
+      }
+
+      table {
+        min-width: 600px;
+      }
+
+      th, td {
+        padding: 12px;
+        font-size: 13px;
+      }
+
+      .export-btn {
+        font-size: 13px;
+        padding: 8px 16px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .header {
+        padding: 0 16px;
+      }
+
+      .header-title {
+        font-size: 16px;
+      }
+
+      .page-title {
+        font-size: 20px;
+      }
+
+      .tab-btn {
+        font-size: 12px;
+        padding: 8px 12px;
+      }
+
+      th, td {
+        padding: 10px;
+        font-size: 12px;
+      }
+
+      .badge {
+        font-size: 11px;
+        padding: 3px 10px;
+      }
+    }
+    .back-link {
+  color: #4299e1;
+  text-decoration: none;
+  font-weight: 500;
+}
+body.dark .back-link {
+  color: #90cdf4; /* Lighter blue for dark mode */
+}
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-title">🔒 Security Toolkit</div>
+  <a href="/" class="back-link">← Back to Dashboard</a>
+</div>
+
+<div class="container">
+  <h1 class="page-title">History & Logs</h1>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('port-scans')">🔍 Port Scans</button>
+    <button class="tab-btn" onclick="switchTab('audits')">📋 System Audits</button>
+    <button class="tab-btn" onclick="switchTab('file-checks')">📁 File Integrity</button>
+    <button class="tab-btn" onclick="switchTab('network-logs')">📡 Network Logs</button>
+  </div>
+
+  <div style="margin-bottom: 20px; display: flex; gap: 12px;">
+    <a href="/export/port_scans/pdf" class="export-btn" id="exportPdfBtn">📄 Export PDF</a>
+    <a href="/export/port_scans/csv" class="export-btn export-btn-secondary" id="exportCsvBtn">📊 Export CSV</a>
+  </div>
+
+  <div class="search-box">
+    <input type="text" class="search-input" id="searchInput" placeholder="🔍 Search by host, directory, timestamp...">
+    <select class="filter-select" id="dateFilter">
+      <option value="all">All Time</option>
+      <option value="today">Today</option>
+      <option value="week">Last 7 Days</option>
+      <option value="month">Last 30 Days</option>
+    </select>
+    <button class="clear-btn" onclick="clearFilters()">Clear</button>
+  </div>
+
+  <div id="port-scans" class="tab-content active">
+    <div class="history-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Host</th>
+            <th>Port Range</th>
+            <th>Open Ports</th>
+            <th>Timestamp</th>
+          </tr>
+        </thead>
+        <tbody id="portScansBody">
+          <tr><td colspan="4" class="no-data">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="audits" class="tab-content">
+    <div class="history-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Operating System</th>
+            <th>CPU Usage</th>
+            <th>RAM Usage</th>
+            <th>Timestamp</th>
+          </tr>
+        </thead>
+        <tbody id="auditsBody">
+          <tr><td colspan="4" class="no-data">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="file-checks" class="tab-content">
+    <div class="history-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Directory</th>
+            <th>Algorithm</th>
+            <th>Files Scanned</th>
+            <th>Timestamp</th>
+          </tr>
+        </thead>
+        <tbody id="fileChecksBody">
+          <tr><td colspan="4" class="no-data">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div id="network-logs" class="tab-content">
+    <div class="history-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Upload (KB/s)</th>
+            <th>Download (KB/s)</th>
+            <th>Timestamp</th>
+          </tr>
+        </thead>
+        <tbody id="networkLogsBody">
+          <tr><td colspan="3" class="no-data">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Load saved theme
+  if (localStorage.getItem('theme') === 'dark') {
+    document.body.classList.add('dark');
+  }
+
+  let allData = {
+    port_scans: [],
+    audits: [],
+    file_checks: [],
+    network_logs: []
+  };
+
+  function switchTab(tabId) {
+    // Hide all tabs
+    document.querySelectorAll('.tab-content').forEach(tab => {
+      tab.classList.remove('active');
+    });
+    
+    // Remove active from all buttons
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    
+    // Show selected tab
+    document.getElementById(tabId).classList.add('active');
+    event.target.classList.add('active');
+    
+    // Update export button links
+    const reportType = tabId.replace('-', '_');
+    document.getElementById('exportPdfBtn').href = `/export/${reportType}/pdf`;
+    document.getElementById('exportCsvBtn').href = `/export/${reportType}/csv`;
+    
+    // Reapply filters when switching tabs
+    applyFilters();
+  }
+
+  function clearFilters() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('dateFilter').value = 'all';
+    applyFilters();
+  }
+
+  function applyFilters() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const dateFilter = document.getElementById('dateFilter').value;
+    
+    // Determine current tab
+    const activeTab = document.querySelector('.tab-content.active').id;
+    
+    let filteredData;
+    switch(activeTab) {
+      case 'port-scans':
+        filteredData = filterData(allData.port_scans, searchTerm, dateFilter, 'port_scan');
+        renderPortScans(filteredData);
+        break;
+      case 'audits':
+        filteredData = filterData(allData.audits, searchTerm, dateFilter, 'audit');
+        renderAudits(filteredData);
+        break;
+      case 'file-checks':
+        filteredData = filterData(allData.file_checks, searchTerm, dateFilter, 'file_check');
+        renderFileChecks(filteredData);
+        break;
+      case 'network-logs':
+        filteredData = filterData(allData.network_logs, searchTerm, dateFilter, 'network');
+        renderNetworkLogs(filteredData);
+        break;
+    }
+  }
+
+  function filterData(data, searchTerm, dateFilter, type) {
+    let filtered = data;
+    
+    // Apply search filter
+    if (searchTerm) {
+      filtered = filtered.filter(item => {
+        const searchableText = JSON.stringify(item).toLowerCase();
+        return searchableText.includes(searchTerm);
+      });
+    }
+    
+    // Apply date filter
+    if (dateFilter !== 'all') {
+      const now = new Date();
+      const cutoffDate = new Date();
+      
+      switch(dateFilter) {
+        case 'today':
+          cutoffDate.setHours(0, 0, 0, 0);
+          break;
+        case 'week':
+          cutoffDate.setDate(now.getDate() - 7);
+          break;
+        case 'month':
+          cutoffDate.setDate(now.getDate() - 30);
+          break;
+      }
+      
+      filtered = filtered.filter(item => {
+        const itemDate = new Date(item.timestamp);
+        return itemDate >= cutoffDate;
+      });
+    }
+    
+    return filtered;
+  }
+
+  function renderPortScans(scans) {
+    const tbody = document.getElementById('portScansBody');
+    if (scans && scans.length > 0) {
+      tbody.innerHTML = scans.map(scan => `
+        <tr>
+          <td><span class="badge badge-info">${scan.host}</span></td>
+          <td>${scan.start_port} - ${scan.end_port}</td>
+          <td><span class="badge badge-success">${scan.open_ports} ports</span></td>
+          <td>${scan.timestamp}</td>
+        </tr>
+      `).join('');
+    } else {
+      tbody.innerHTML = '<tr><td colspan="4" class="no-data">No results found</td></tr>';
+    }
+  }
+
+  function renderAudits(audits) {
+    const tbody = document.getElementById('auditsBody');
+    if (audits && audits.length > 0) {
+      tbody.innerHTML = audits.map(audit => `
+        <tr>
+          <td>${audit.os}</td>
+          <td><span class="badge badge-info">${audit.cpu_usage}</span></td>
+          <td><span class="badge badge-warning">${audit.ram_usage}</span></td>
+          <td>${audit.timestamp}</td>
+        </tr>
+      `).join('');
+    } else {
+      tbody.innerHTML = '<tr><td colspan="4" class="no-data">No results found</td></tr>';
+    }
+  }
+
+  function renderFileChecks(checks) {
+    const tbody = document.getElementById('fileChecksBody');
+    if (checks && checks.length > 0) {
+      tbody.innerHTML = checks.map(check => `
+        <tr>
+          <td>${check.directory}</td>
+          <td><span class="badge badge-info">${check.algorithm.toUpperCase()}</span></td>
+          <td><span class="badge badge-success">${check.files_count} files</span></td>
+          <td>${check.timestamp}</td>
+        </tr>
+      `).join('');
+    } else {
+      tbody.innerHTML = '<tr><td colspan="4" class="no-data">No results found</td></tr>';
+    }
+  }
+
+  function renderNetworkLogs(logs) {
+    const tbody = document.getElementById('networkLogsBody');
+    if (logs && logs.length > 0) {
+      tbody.innerHTML = logs.map(log => `
+        <tr>
+          <td>${log.upload} KB/s</td>
+          <td>${log.download} KB/s</td>
+          <td>${log.timestamp}</td>
+        </tr>
+      `).join('');
+    } else {
+      tbody.innerHTML = '<tr><td colspan="3" class="no-data">No results found</td></tr>';
+    }
+  }
+
+  // Add event listeners for real-time filtering
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('searchInput').addEventListener('input', applyFilters);
+    document.getElementById('dateFilter').addEventListener('change', applyFilters);
+  });
+
+  // Load history data
+  async function loadHistoryData() {
+    try {
+      const res = await fetch('/api/history_data');
+      if (!res.ok) throw new Error('Failed to fetch history');
+      const data = await res.json();
+      
+      // Store all data globally
+      allData = data;
+      
+      // Populate Port Scans
+      renderPortScans(data.port_scans);
+      
+      // Populate Audits
+      renderAudits(data.audits);
+      
+      // Populate File Checks
+      renderFileChecks(data.file_checks);
+      
+      // Populate Network Logs
+      renderNetworkLogs(data.network_logs);
+      
+    } catch(e) {
+      console.error('Error loading history:', e);
+      document.querySelectorAll('tbody').forEach(tbody => {
+        tbody.innerHTML = '<tr><td colspan="4" class="no-data">Failed to load data</td></tr>';
+      });
+    }
+  }
+
+  // Load data on page load
+  window.addEventListener('load', loadHistoryData);
+</script>
+
+</body>
+</html>
