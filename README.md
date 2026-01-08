@@ -121,17 +121,19 @@ Prevents brute-force attacks with configurable limits:
 ## 📸 Screenshots
 
 ### Dashboard
-![Dashboard](https://via.placeholder.com/800x400?text=Dashboard+Overview)
+![Dashboard](screenshots/dashboard.png)
 
 ### Port Scanner
-![Port Scanner](https://via.placeholder.com/800x400?text=Port+Scanner)
+![Port Scanner](screenshots/port-scanner.png)
 
 ### File Integrity Monitor
-![File Integrity](https://via.placeholder.com/800x400?text=File+Integrity+Monitor)
+![File Integrity](screenshots/file-integrity.png)
 
 ### System Audit
-![System Audit](https://via.placeholder.com/800x400?text=System+Audit)
+![System Audit](screenshots/system-audit.png)
 
+### Network Monitor
+![Network Monitor](screenshots/network-monitor.png)
 ---
 
 ## 🚀 Installation
